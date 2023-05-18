@@ -34,27 +34,26 @@ def checkVids(basePath):
         if item.is_file():
             if item.name.endswith('_vidList.txt'):
                 dateList.append(item.name)
-    match len(dateList):
-        case 0:
-            sys.exit('No video files found')
-        case 1:
-            return [dateList[0]]
-        case _ if len(dateList) > 1:
-            for idx, date in enumerate(dateList):
-                print(f'{idx + 1}. {date.split("_")[0]}')
-            for _ in range(3):
-                try:
-                    userChoice = input(f"Choose date/time of video (1-{len(dateList)}) or type 'all':\n")
-                    if userChoice.lower().strip() == 'all':
-                        return dateList
-                    else:
-                        return [dateList[int(userChoice) - 1]]
-                except ValueError as ve:
-                    print("Please enter a vaild option")
-                    continue
-                except Exception as e:
-                    sys.exit(f"Video Choice Error: {e}")
-            sys.exit("Too Many Invalid Choices, Please Try Again")
+    if len(dateList) == 0:
+        sys.exit('No video files found')
+    elif len(dateList) == 1:
+        return [dateList[0]]
+    elif len(dateList) > 1:
+        for idx, date in enumerate(dateList):
+            print(f'{idx + 1}. {date.split("_")[0]}')
+        for _ in range(3):
+            try:
+                userChoice = input(f"Choose date/time of video (1-{len(dateList)}) or type 'all':\n")
+                if userChoice.lower().strip() == 'all':
+                    return dateList
+                else:
+                    return [dateList[int(userChoice) - 1]]
+            except ValueError as ve:
+                print("Please enter a vaild option")
+                continue
+            except Exception as e:
+                sys.exit(f"Video Choice Error: {e}")
+        sys.exit("Too Many Invalid Choices, Please Try Again")
 
 def concatVid(basePath, vidList):
     # print(f"{basePath}/{vidList}")
@@ -75,14 +74,18 @@ def concatVid(basePath, vidList):
 def initParser():
     parser = ArgumentParser()
     parser.add_argument(
-        'path',
-        help='Path to directory containing video files',
+        '-d',
+        '--dir',
+        help='Specify path to directory containing video files, if not default',
         type=str)
     return parser.parse_args()
 
 def main():
     args = initParser()
-    path = args.path
+    if args.dir:
+        path = args.dir
+    else:
+        path = '/data/media/0/realdata/'
     try:
         catalogVids(path)
         vidList = checkVids(path)
